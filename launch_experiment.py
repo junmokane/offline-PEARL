@@ -17,7 +17,7 @@ from rlkit.torch.sac.sac import PEARLSoftActorCritic
 from rlkit.torch.sac.agent import PEARLAgent
 from rlkit.launchers.launcher_util import setup_logger
 import rlkit.torch.pytorch_util as ptu
-from configs.default_v1 import default_config
+from configs.default import default_config
 
 
 def experiment(variant):

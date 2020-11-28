@@ -7,6 +7,7 @@ import numpy as np
 
 from rlkit.core import logger, eval_util
 from rlkit.data_management.env_replay_buffer import MultiTaskReplayBuffer
+from rlkit.data_management.env_offline_replay_buffer import OfflineMultiTaskReplayBuffer
 from rlkit.data_management.path_builder import PathBuilder
 from rlkit.samplers.in_place import InPlacePathSampler
 from rlkit.torch import pytorch_util as ptu
@@ -99,6 +100,7 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
         # separate replay buffers for
         # - training RL update
         # - training encoder update
+        # originally, MultiTaskReplayBuffer
         self.replay_buffer = MultiTaskReplayBuffer(
                 self.replay_buffer_size,
                 env,
@@ -110,6 +112,9 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
                 env,
                 self.train_tasks,
         )
+
+        # self.enc_replay_buffer = self.replay_buffer
+
 
         self._n_env_steps_total = 0
         self._n_train_steps_total = 0
@@ -155,13 +160,15 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
         ):
             self._start_epoch(it_)
             self.training_mode(True)
+
+            # In offline PEARL, we do not need collecting data
+            # self.replay_buffer = self.enc_replay_buffer from above initialization
             if it_ == 0:
                 print('collecting initial pool of data for train and eval')
                 # temp for evaluating
                 for idx in self.train_tasks:  # [0, 1]
                     self.task_idx = idx
                     self.env.reset_task(idx)  # 0 for {'distributions':-1} which is cheetah-mixed
-                    exit()
                     self.collect_data(self.num_initial_steps, 1, np.inf)
 
             # Sample data from train tasks.

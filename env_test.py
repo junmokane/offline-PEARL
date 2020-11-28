@@ -17,19 +17,24 @@ ant_task_name = ['ant-medium-expert-v0',
                  'ant-expert-v0',
                  ]
 
-i = 2
-env = gym.make(ant_task_name[i])
+i = 1
+env = gym.make(halfcheetah_task_name[i])
+
 dataset = env.get_dataset()
 print(dataset['observations'].shape) # An N x dim_observation Numpy array of observations (N = 1e6)
 print(dataset['actions'].shape)
 print(dataset['rewards'].shape)
-
+exit()
 # Alternatively, use d4rl.qlearning_dataset which
 # also adds next_observations.
 #dataset = d4rl.qlearning_dataset(env)
 #print(dataset)
 
-_ = env.reset()
+env = gym.make('HalfCheetah-v2')
+obs = env.reset()
+print(obs.shape)
+
 while True:
     env.render(mode='human')
-    env.step(env.action_space.sample())
+    a = env.step(env.action_space.sample())
+    print(a)
